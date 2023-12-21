@@ -3,12 +3,13 @@ package com.bookstore.repository;
 import com.bookstore.model.entity.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
-    @Query("SELECT u FROM Book u WHERE title LIKE '%?1%'")
-    Collection<Book> searchByTitle(String title);
+    @Query("SELECT b FROM Book b WHERE b.title LIKE %:title%")
+    Collection<Book> searchByTitle(@Param("title") String title);
 
     Collection<Book> findAllByTitle(String title);
 

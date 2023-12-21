@@ -34,7 +34,7 @@ public class Author {
 
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "authors")
+    @ManyToMany(mappedBy = "authors", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private Set<Book> books;
 
 }

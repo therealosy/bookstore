@@ -74,12 +74,16 @@ public class BookService {
             throw new NoSuchElementException("No Genre found");
         }
 
+        log.info("Adding genres: {}", genres);
+
         Book book = bookRepository.findById(id).orElseThrow();
         book.setGenres(genres);
 
+        log.info("Added genres to book. Book is now: {}", book);
+
         bookRepository.save(book);
 
-        return UpdateResponse.builder().message("Successfully Set Authors").build();
+        return UpdateResponse.builder().message("Successfully Set Genres").build();
     }
 
     public Book addBook(Book book) {
@@ -91,21 +95,38 @@ public class BookService {
     }
 
     public Collection<Book> loadAllBooksByAuthor(String authorName){
+        log.info("Searching for authors with title: {}", authorName);
         Collection<Author> authors = authorService.loadAuthorsByFirstNameOrLastName(authorName);
 
-        return authors.stream()
+        log.info("Got authors {}", authors);
+
+        Collection<Book> books = authors.stream()
                 .flatMap(author -> author.getBooks().stream())
                 .toList();
+
+        log.info("Got books for author: {}", books);
+        return books;
     }
 
     public Collection<Book> loadAllBooksByGenre(String genreTitle){
+
+        log.info("Searching for genres with title: {}", genreTitle);
         Collection<Genre> genres = genreService.loadGenresByTitle(genreTitle);
 
-        return genres.stream()
+        log.info("Got genres {}", genres);
+        Collection<Book> books = genres.stream()
                 .flatMap(genre -> genre.getBooks().stream())
                 .toList();
+        log.info("Got books for genre: {}", books);
+
+        return books;
     }
     public Collection<Book> loadAllBooksByYear(Integer year){return  bookRepository.findAllByYearPublished(year);}
 
-    public Collection<Book> searchBooksByTitle(String title){return bookRepository.searchByTitle(title);}
+    public Collection<Book> searchBooksByTitle(String title){
+        log.info("Searching for book with title like {}", title);
+        Collection<Book> books = bookRepository.searchByTitle(title);
+        log.info("Got {}", books);
+        return books;
+    }
 }

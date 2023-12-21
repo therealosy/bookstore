@@ -45,6 +45,30 @@ PRIMARY KEY CLUSTERED
 ) ON [PRIMARY]
 GO
 
+---- Create users table
+
+CREATE TABLE [dbo].[users](
+	[user_id] [bigint] NOT NULL,
+	[date_created] [datetime2](6) NULL,
+	[email] [varchar](255) NOT NULL,
+	[first_name] [varchar](255) NOT NULL,
+	[is_user_enabled] [bit] NULL,
+	[last_name] [varchar](255) NOT NULL,
+	[password] [varchar](255) NOT NULL,
+	[role] [varchar](255) NULL,
+PRIMARY KEY CLUSTERED
+(
+	[user_id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+ CONSTRAINT [UK_6dotkott2kjsp8vw4d0m25fb7] UNIQUE NONCLUSTERED
+(
+	[email] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[users]  WITH CHECK ADD CHECK  (([role]='ROLE_ADMIN' OR [role]='ROLE_USER'))
+GO
 
 ---- Create carts table
 
@@ -106,33 +130,6 @@ GO
 
 ALTER TABLE [dbo].[payments]  WITH CHECK ADD CHECK  (([payment_status]='SUCCESSFUL' OR [payment_status]='FAILED' OR [payment_status]='PENDING'))
 GO
-
-
----- Create users table
-
-CREATE TABLE [dbo].[users](
-	[user_id] [bigint] NOT NULL,
-	[date_created] [datetime2](6) NULL,
-	[email] [varchar](255) NOT NULL,
-	[first_name] [varchar](255) NOT NULL,
-	[is_user_enabled] [bit] NULL,
-	[last_name] [varchar](255) NOT NULL,
-	[password] [varchar](255) NOT NULL,
-	[role] [varchar](255) NULL,
-PRIMARY KEY CLUSTERED
-(
-	[user_id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
- CONSTRAINT [UK_6dotkott2kjsp8vw4d0m25fb7] UNIQUE NONCLUSTERED
-(
-	[email] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-
-ALTER TABLE [dbo].[users]  WITH CHECK ADD CHECK  (([role]='ROLE_ADMIN' OR [role]='ROLE_USER'))
-GO
-
 
 ---- Create verification_codes table
 

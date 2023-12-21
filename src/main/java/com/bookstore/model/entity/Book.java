@@ -30,7 +30,7 @@ public class Book {
     @ISBNConstraint
     private String isbn;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name="bookAuthors",
             joinColumns = @JoinColumn(name = "bookId"),
             inverseJoinColumns = @JoinColumn(name = "authorId")
@@ -38,7 +38,7 @@ public class Book {
     private Set<Author> authors;
 
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name="bookGenres",
             joinColumns = @JoinColumn(name = "bookId"),
             inverseJoinColumns = @JoinColumn(name = "genreId")

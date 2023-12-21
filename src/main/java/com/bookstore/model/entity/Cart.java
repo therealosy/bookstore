@@ -22,7 +22,7 @@ public class Cart {
     @Id
     private Long cartUserId;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name="cartItems",
             joinColumns = @JoinColumn(name = "cartUserId"),
             inverseJoinColumns = @JoinColumn(name = "bookId")

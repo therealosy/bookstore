@@ -56,7 +56,7 @@ public class User implements UserDetails {
     @CreatedDate
     private Date dateCreated;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private Set<Order> orders;
 
     @Override

@@ -28,7 +28,7 @@ public class Genre {
 
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "genres")
+    @ManyToMany(mappedBy = "genres", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private Set<Book> books;
 
 }
