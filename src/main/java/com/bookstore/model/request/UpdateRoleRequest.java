@@ -1,5 +1,6 @@
 package com.bookstore.model.request;
 
+import com.bookstore.model.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,8 +10,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateBookRequest {
-    private String title;
-    private Long price;
-    private Integer yearPublished;
+public class UpdateRoleRequest {
+    private Role role;
 }

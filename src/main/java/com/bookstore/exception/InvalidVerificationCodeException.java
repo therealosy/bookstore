@@ -1,6 +1,6 @@
 package com.bookstore.exception;
 
-public class InvalidVerificationCodeException extends Exception{
+public class InvalidVerificationCodeException extends RuntimeException{
     public InvalidVerificationCodeException(String errorMessage, Throwable err){
         super(errorMessage, err);
     }

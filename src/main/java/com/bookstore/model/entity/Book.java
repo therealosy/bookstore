@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Year;
 import java.util.Set;
 
 @Data
@@ -17,7 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Books")
+@Table(name = "books")
 public class Book {
 
     @Id
@@ -31,13 +30,19 @@ public class Book {
     @ISBNConstraint
     private String isbn;
 
-
-    @ManyToMany(mappedBy = "books")
-    @JsonIgnoreProperties("books")
+    @ManyToMany
+    @JoinTable(name="bookAuthors",
+            joinColumns = @JoinColumn(name = "bookId"),
+            inverseJoinColumns = @JoinColumn(name = "authorId")
+    )
     private Set<Author> authors;
 
-    @ManyToMany(mappedBy = "books")
-    @JsonIgnoreProperties("books")
+
+    @ManyToMany
+    @JoinTable(name="bookGenres",
+            joinColumns = @JoinColumn(name = "bookId"),
+            inverseJoinColumns = @JoinColumn(name = "genreId")
+    )
     private Set<Genre> genres;
 
     @Column(nullable = false)
@@ -49,4 +54,8 @@ public class Book {
     @JsonIgnore
     @ManyToMany(mappedBy = "books")
     private Set<Cart> carts;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "books")
+    private Set<Order> orders;
 }

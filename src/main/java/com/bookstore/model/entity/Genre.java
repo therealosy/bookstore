@@ -1,5 +1,6 @@
 package com.bookstore.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Genres")
+@Table(name = "genres")
 public class Genre {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -24,12 +25,10 @@ public class Genre {
     @Column(nullable = false)
     private String genreTitle;
 
-    @ManyToMany
-    @JoinTable(name="bookGenres",
-            joinColumns = @JoinColumn(name = "genreId"),
-            inverseJoinColumns = @JoinColumn(name = "bookId")
-    )
-    @JsonIgnoreProperties("genres")
+
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "genres")
     private Set<Book> books;
 
 }

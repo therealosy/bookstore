@@ -1,5 +1,6 @@
 package com.bookstore.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -28,15 +29,23 @@ public class Author {
     @Column(nullable = false)
     private String lastName;
 
-    @Column(nullable = true)
+    @Column
     private String middleName;
 
-    @ManyToMany
-    @JoinTable(name="bookAuthors",
-            joinColumns = @JoinColumn(name = "authorId"),
-            inverseJoinColumns = @JoinColumn(name = "bookId")
-    )
-    @JsonIgnoreProperties("authors")
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "authors")
     private Set<Book> books;
 
 }
+
+
+
+
+
+
+
+
+
+
+

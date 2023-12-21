@@ -3,34 +3,33 @@ package com.bookstore.model.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.Set;
 
-@Entity
-@Table(name = "Carts")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "carts")
 public class Cart {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long cartId;
-
-    @ManyToOne
-    @JoinColumn(name = "userId")
-    private User user;
+    private Long cartUserId;
 
     @ManyToMany
     @JoinTable(name="cartItems",
-            joinColumns = @JoinColumn(name = "cartId"),
+            joinColumns = @JoinColumn(name = "cartUserId"),
             inverseJoinColumns = @JoinColumn(name = "bookId")
     )
     private Set<Book> books;
 
-    @Column
-    private Boolean isCheckedOut;
-
-    @Column(nullable = false)
+    @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Date dateCreated;

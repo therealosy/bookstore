@@ -24,5 +24,5 @@ public class Verification {
 
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private Date expires;
+    private Date expiresAt;
 }

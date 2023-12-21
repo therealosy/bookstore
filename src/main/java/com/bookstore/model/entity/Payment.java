@@ -1,6 +1,7 @@
 package com.bookstore.model.entity;
 
 import com.bookstore.model.enums.PaymentMethod;
+import com.bookstore.model.enums.PaymentStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,45 +11,33 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.util.Date;
-import java.util.Set;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "orders")
-public class Order {
+@Table(name = "payments")
+public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long orderId;
+    private Long paymentId;
 
-    @ManyToOne
-    @JoinColumn(name = "userId")
-    private User user;
+    @Column(nullable = false)
+    private String paymentReference;
+
+    @Column(nullable = false)
+    private String orderReference;
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
-    @ManyToMany
-    @JoinTable(name="orderItems",
-            joinColumns = @JoinColumn(name = "orderId"),
-            inverseJoinColumns = @JoinColumn(name = "bookId")
-    )
-    private Set<Book> books;
-
-    @Column(nullable = false)
-    private Long total;
-
-    @Column(nullable = false)
-    private Boolean hasPaid;
-
-    @Column(nullable = false)
-    private String orderReference;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
 
 
     @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private Date dateCheckedOut;
+    private Date dateOfPayment;
 }

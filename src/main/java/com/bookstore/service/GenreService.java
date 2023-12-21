@@ -3,6 +3,7 @@ package com.bookstore.service;
 import com.bookstore.model.entity.Genre;
 import com.bookstore.repository.GenreRepository;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -13,17 +14,17 @@ public class GenreService{
 
     public final GenreRepository genreRepository;
 
-    public Collection<Genre> getAllGenres() {
+    public Collection<Genre> loadAllGenres() {
         return genreRepository.findAll();
     }
 
 
-    public Genre getGenreById(Long id) {
+    public Genre loadGenreById(Long id) {
         return genreRepository.findById(id).orElseThrow();
     }
 
 
-    public Genre updateGenre(Long id, Genre genre) {
+    public Genre updateGenre(Long id, @NotNull Genre genre) {
         Genre updatedGenre = genreRepository.findById(id).orElseThrow();
         updatedGenre.setGenreTitle(genre.getGenreTitle());
         return genreRepository.save(updatedGenre);
@@ -35,7 +36,12 @@ public class GenreService{
     }
 
 
-    public Genre getGenreByTitle(String genreTitle) {
-        return genreRepository.findByTitle(genreTitle).orElseThrow();
+    public Collection<Genre> loadGenresByTitle(String genreTitle) {
+        return genreRepository.findAllByGenreTitle(genreTitle);
     }
+
+    public Collection<Genre> loadGenreByIds(Collection<Long> genreIds){
+        return genreRepository.findAllById(genreIds);
+    }
+
 }

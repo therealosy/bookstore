@@ -7,6 +7,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +20,11 @@ import java.util.function.Function;
 @Service
 public class JwtUtil {
 
-    @Value("${bookstore.jwt.secret-key: secret}")
-    private static String SECRET_KEY;
+    @Value("${bookstore.jwt.secret-key:secret}")
+    private String SECRET_KEY;
 
-    @Value("${bookstore.jwt.validity-duration-seconds: 900}")
-    private static Integer VALIDITY_DURATION_SECONDS;
+    @Value("${bookstore.jwt.validity-duration-seconds:900}")
+    private Integer VALIDITY_DURATION_SECONDS;
 
     public String extractUsername(String token){
         return extractClaim(token, Claims::getSubject);
@@ -49,8 +50,9 @@ public class JwtUtil {
     }
 
 
-    public String generateToken(Map<String, Object> extraClaims, @NotNull UserDetails userDetails){
-        extraClaims.put("Roles", userDetails.getAuthorities());
+    public String generateToken(@NotNull Map<String, Object> extraClaims, @NotNull UserDetails userDetails){
+        String role = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toString();
+        extraClaims.put("role", role);
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())

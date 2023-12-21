@@ -1,63 +1,91 @@
 package com.bookstore.controller;
 
 import com.bookstore.exception.InvalidVerificationCodeException;
+import com.bookstore.model.enums.ResponseMessage;
 import com.bookstore.model.request.AuthRequest;
 import com.bookstore.model.request.RegisterRequest;
-import com.bookstore.model.request.VerifyRequest;
-import com.bookstore.model.response.RegisterResponse;
+import com.bookstore.model.response.GenericResponse;
 import com.bookstore.service.AuthService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(name = "Authentication Endpoints", description = "Endpoints for registering, verifying and authenticating users")
 public class AuthController {
 
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<Object> register(
+    public ResponseEntity<GenericResponse> register(
             @RequestBody RegisterRequest request
             ){
+        log.info("Registering user: {}", request.getEmail());
         try {
-            return ResponseEntity.status(201).body(authService.register(request));
+            return ResponseEntity.status(201).body(GenericResponse.builder()
+                    .message(ResponseMessage.CREATED)
+                    .responseData(authService.register(request))
+                    .build());
         }catch (Exception e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            log.warn("Failed to register user due to: {}", e.toString());
+            return ResponseEntity.internalServerError().body(GenericResponse.builder()
+                    .message(e.getMessage())
+                    .responseData(null)
+                    .build());
         }
     }
 
-    @PostMapping("/verify-account")
-    public ResponseEntity<Object> register(
-            @RequestBody VerifyRequest request
+    @PatchMapping("/verify-account/{verificationCode}")
+    public ResponseEntity<GenericResponse> verifyUser(
+            @PathVariable String verificationCode
     ){
         try {
-            return ResponseEntity.ok(authService.verifyUser(request.getVerificationCode()));
+            return ResponseEntity.accepted().body(GenericResponse.builder()
+                    .message(ResponseMessage.ACCEPTED)
+                    .responseData(authService.verifyUser(verificationCode))
+                    .build());
         }catch (InvalidVerificationCodeException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(GenericResponse.builder()
+                    .message(e.getMessage())
+                    .responseData(null)
+                    .build());
         }catch (Exception e){
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            return ResponseEntity.internalServerError().body(GenericResponse.builder()
+                    .message(e.getMessage())
+                    .responseData(null)
+                    .build());
         }
     }
 
     @PostMapping("/token")
-    public ResponseEntity<Object> authenticate(
+    public ResponseEntity<GenericResponse> authenticate(
             @RequestBody AuthRequest request
     ){
         try {
-            return ResponseEntity.accepted().body(authService.authenticate(request));
+            return ResponseEntity.ok(GenericResponse.builder()
+                    .message(ResponseMessage.SUCCESS)
+                    .responseData(authService.authenticate(request))
+                    .build());
         }catch (UsernameNotFoundException e) {
-            return ResponseEntity.status(404).body(e.getMessage());
+            return ResponseEntity.status(404).body(GenericResponse.builder()
+                    .message(e.getMessage())
+                    .responseData(null)
+                    .build());
         }
         catch (Exception e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            log.warn("Failed to authenticate user due to {}", e.toString());
+            return ResponseEntity.internalServerError().body(GenericResponse.builder()
+                    .message(e.getMessage())
+                    .responseData(null)
+                    .build());
         }
     }
 }

@@ -7,39 +7,41 @@ import com.bookstore.model.request.RegisterRequest;
 import com.bookstore.model.response.AuthResponse;
 import com.bookstore.model.response.RegisterResponse;
 import com.bookstore.model.response.UpdateResponse;
-import com.bookstore.repository.UserRepository;
-import com.bookstore.repository.VerificationRepository;
 import com.bookstore.util.auth.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
     private final UserService userService;
     private final VerificationService verificationService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authManager;
-    private final VerificationRepository verificationRepository;
 
-    public RegisterResponse register(RegisterRequest request){
-      User user = userService.addUser(request);
-      Verification verification = verificationService.addVerification(user.getUserId());
+    public RegisterResponse register(@NotNull RegisterRequest request){
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        request.setPassword(encodedPassword);
+        User user = userService.addUser(request);
+        Verification verification = verificationService.addVerification(user.getUserId());
 
-      return RegisterResponse.builder()
+        return RegisterResponse.builder()
               .message("Success")
               .verificationCode(verification.getVerificationCode())
-              .expiresIn(verification.getExpires())
+              .expiresIn(verification.getExpiresAt())
               .build();
     }
 
-    public AuthResponse authenticate(AuthRequest request){
+    public AuthResponse authenticate(@NotNull AuthRequest request){
+        log.info("Authenticating user {}", request.getEmail());
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -61,7 +63,7 @@ public class AuthService {
         Verification verification = verificationService.loadVerificationCode(verificationCode);
         userService.enableUser(verification.getUserId());
 
-        verificationService.deleteVerificationCode(verificationCode);
+        verificationService.deleteVerificationCode(verification.getUserId());
         return UpdateResponse.builder().message("Successfully verified User").build();
     }
 }

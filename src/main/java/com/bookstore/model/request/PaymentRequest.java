@@ -5,12 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.awt.*;
+import java.util.Map;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateBookRequest {
-    private String title;
-    private Long price;
-    private Integer yearPublished;
+public class PaymentRequest {
+    private Map<String, String> paymentObject;
 }

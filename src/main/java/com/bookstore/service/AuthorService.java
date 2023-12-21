@@ -1,8 +1,10 @@
 package com.bookstore.service;
 
 import com.bookstore.model.entity.Author;
+import com.bookstore.model.entity.Book;
 import com.bookstore.repository.AuthorRepository;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -15,7 +17,7 @@ public class AuthorService{
     private final AuthorRepository authorRepository;
 
 
-    public Collection<Author> getAllAuthors() {
+    public Collection<Author> loadAllAuthors() {
         return authorRepository.findAll();
     }
 
@@ -25,7 +27,7 @@ public class AuthorService{
     }
 
 
-    public Author updateAuthor(Long id, Author author) {
+    public Author updateAuthor(Long id, @NotNull Author author) {
         Author updatedAuthor = authorRepository.findById(id).orElseThrow();
 
         updatedAuthor.setFirstName(author.getFirstName());
@@ -40,7 +42,11 @@ public class AuthorService{
         return authorRepository.save(author);
     }
 
-    public Author loadAuthorByFirstNameOrLastName(String firstNameOrLastName) {
-        return authorRepository.findByFirstNameOrLastName(firstNameOrLastName, firstNameOrLastName).orElseThrow();
+    public Collection<Author> loadAuthorsByFirstNameOrLastName(String firstNameOrLastName) {
+        return authorRepository.findAllByFirstNameOrLastName(firstNameOrLastName, firstNameOrLastName);
+    }
+
+    public Collection<Author> loadAuthorsByIds(Collection<Long> authorIds){
+        return authorRepository.findAllById(authorIds);
     }
 }

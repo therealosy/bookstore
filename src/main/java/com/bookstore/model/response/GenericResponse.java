@@ -1,4 +1,4 @@
-package com.bookstore.model.request;
+package com.bookstore.model.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateBookRequest {
-    private String title;
-    private Long price;
-    private Integer yearPublished;
+public class GenericResponse {
+    private String message;
+    private Object responseData;
 }

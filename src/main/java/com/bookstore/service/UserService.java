@@ -4,10 +4,12 @@ import com.bookstore.model.entity.User;
 import com.bookstore.model.enums.Role;
 import com.bookstore.model.request.RegisterRequest;
 import com.bookstore.model.request.UpdatePasswordRequest;
+import com.bookstore.model.request.UpdateRoleRequest;
 import com.bookstore.model.request.UpdateUserRequest;
 import com.bookstore.model.response.UpdateResponse;
 import com.bookstore.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,8 +23,6 @@ import java.util.Optional;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final VerificationService verificationService;
-    private final PasswordEncoder passwordEncoder;
 
     public Collection<User> loadAllUsers(){
         return userRepository.findAll();
@@ -43,6 +43,18 @@ public class UserService implements UserDetailsService {
         return user.get();
     }
 
+    public UpdateResponse updateUserRole(Long id, UpdateRoleRequest request) throws UsernameNotFoundException{
+        Optional<User> oldUser = userRepository.findById(id);
+        if(oldUser.isEmpty())
+            throw new UsernameNotFoundException("User not found");
+
+        User updatedUser = oldUser.get();
+        updatedUser.setRole(request.getRole());
+        userRepository.save(updatedUser);
+
+        return UpdateResponse.builder().message("Successfully Updated User Role").build();
+    }
+
     public UpdateResponse updateUserDetails(Long id, UpdateUserRequest request) throws UsernameNotFoundException{
         Optional<User> oldUser = userRepository.findById(id);
         if(oldUser.isEmpty())
@@ -57,13 +69,13 @@ public class UserService implements UserDetailsService {
         return UpdateResponse.builder().message("Successfully Updated User details").build();
     }
 
-    public UpdateResponse updateUserPassword(Long id, UpdatePasswordRequest request) throws UsernameNotFoundException{
+    public UpdateResponse updateUserPassword(Long id, String newPassword) throws UsernameNotFoundException{
         Optional<User> oldUser = userRepository.findById(id);
         if(oldUser.isEmpty())
             throw new UsernameNotFoundException("User not found");
 
         User updatedUser = oldUser.get();
-        updatedUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        updatedUser.setPassword(newPassword);
 
         userRepository.save(updatedUser);
 
@@ -78,12 +90,12 @@ public class UserService implements UserDetailsService {
         userRepository.save(existingUser);
     }
 
-    public User addUser(RegisterRequest request){
+    public User addUser(@NotNull RegisterRequest request){
      return userRepository.save(User.builder()
              .firstName(request.getFirstName())
              .lastName(request.getLastName())
              .email(request.getEmail())
-             .password(passwordEncoder.encode(request.getPassword()))
+             .password(request.getPassword())
              .role(Role.ROLE_USER)
              .isUserEnabled(false)
              .build()
