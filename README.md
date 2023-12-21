@@ -6,13 +6,15 @@ This is a Spring Boot REST application for a bookstore.
 
 1. **Prerequisites**: Ensure you have Jdk 17 or newer, Maven and SQL Server installed on your system.
 
-2. **Clone the repository**: Use the command `git clone https://github.com/therealosy/bookstore.git` to clone the repository to your local machine.
+2. **Database Setup**: Create a new empty database with the desired database name and database credentials.
 
-3. **Configure the application parameters** Edit the `application.properties` file in `src/main/resources` to configure the required parameters.
+3. **Clone the repository**: Use the command `git clone https://github.com/therealosy/bookstore.git` to clone the repository to your local machine.
 
-4. **Build the project**: Navigate to the project directory and use the command `mvn clean install` to build the project.
+4. **Configure the application parameters** Edit the `application.properties` file in `src/main/resources` to configure the required application parameters.
 
-5. **Run the application**: Use the command `mvn spring-boot:run` to start the application.
+5. **Build the project**: Navigate to the project directory and use the command `mvn clean install` to build the project.
+
+6. **Run the application**: Use the command `mvn spring-boot:run` to start the application.
 
 ## API Documentation
 
