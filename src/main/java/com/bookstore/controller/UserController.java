@@ -13,15 +13,18 @@ import com.bookstore.service.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
 
+@Slf4j
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/user/me")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "User Endpoints", description = "Endpoints for users to manage their accounts including their carts and orders")
@@ -31,9 +34,13 @@ public class UserController {
     private final CartService cartService;
     private final PasswordEncoder passwordEncoder;
 
-    @GetMapping("/{userId}/cart")
-    public ResponseEntity<GenericResponse> getUserCart(@PathVariable Long userId){
+
+    @GetMapping("/cart")
+    public ResponseEntity<GenericResponse> getUserCart(Authentication authentication){
+        String userName = authentication.getName();
+        log.info("Fetching cart for, {}", userName);
         try {
+            Long userId = userService.getUserIdFromAuthentication(authentication);
             return ResponseEntity.ok(
                     GenericResponse.builder()
                             .message(ResponseMessage.SUCCESS)
@@ -53,12 +60,22 @@ public class UserController {
         }
     }
 
-    @PostMapping("/{userId}/cart")
-    public ResponseEntity<GenericResponse> createUserCart(@PathVariable Long userId){
+    @GetMapping("/orders")
+    public ResponseEntity<GenericResponse> getUserOrders(Authentication authentication){
+        String userName = authentication.getName();
+        log.info("Fetching Orders for, {}", userName);
         try {
-            return ResponseEntity.status(201).body(GenericResponse.builder()
-                    .message(ResponseMessage.CREATED)
-                    .responseData(cartService.createCart(userId))
+            Long userId = userService.getUserIdFromAuthentication(authentication);
+            return ResponseEntity.ok(
+                    GenericResponse.builder()
+                            .message(ResponseMessage.SUCCESS)
+                            .responseData(userService.loadUserOrders(userId))
+                            .build()
+            );
+        }catch (NoSuchElementException e){
+            return ResponseEntity.status(404).body(GenericResponse.builder()
+                    .message(e.getMessage())
+                    .responseData(null)
                     .build());
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(GenericResponse.builder()
@@ -69,9 +86,12 @@ public class UserController {
     }
 
 
-    @PutMapping("/{userId}/cart/{bookId}")
-    public ResponseEntity<GenericResponse> addToUserCart(@PathVariable Long userId, @PathVariable Long bookId){
+    @PutMapping("/cart/{bookId}")
+    public ResponseEntity<GenericResponse> addToUserCart(@PathVariable Long bookId, Authentication authentication){
+        String userName = authentication.getName();
+        log.info("Adding Book to cart for, {}", userName);
         try {
+            Long userId = userService.getUserIdFromAuthentication(authentication);
             return ResponseEntity.accepted().body(GenericResponse.builder()
                     .message(ResponseMessage.ACCEPTED)
                     .responseData(cartService.addBookToCart(userId, bookId))
@@ -89,9 +109,12 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/{userId}/cart/{bookId}")
-    public ResponseEntity<GenericResponse> removeFromCart(@PathVariable Long userId, @PathVariable Long bookId){
+    @DeleteMapping("/cart/{bookId}")
+    public ResponseEntity<GenericResponse> removeFromCart(@PathVariable Long bookId, Authentication authentication){
+        String userName = authentication.getName();
+        log.info("Removing book from cart for, {}", userName);
         try {
+            Long userId = userService.getUserIdFromAuthentication(authentication);
             return ResponseEntity.accepted().body(GenericResponse.builder()
                     .message(ResponseMessage.ACCEPTED)
                     .responseData(cartService.removeBookFromCart(userId, bookId))
@@ -109,14 +132,17 @@ public class UserController {
         }
     }
 
-    @PostMapping("/{userId}/cart/checkout")
-    public ResponseEntity<GenericResponse> checkoutUserCart(@PathVariable Long userId, @RequestBody PaymentMethod paymentMethod){
+    @PostMapping("/cart/checkout")
+    public ResponseEntity<GenericResponse> checkoutUserCart(@RequestParam PaymentMethod paymentMethod, Authentication authentication){
+        String userName = authentication.getName();
+        log.info("Checking out cart for, {}", userName);
         try {
-            CheckoutResponse checkoutResponse = orderService.addOrder(userId, paymentMethod);
+            Long userId = userService.getUserIdFromAuthentication(authentication);
+            CheckoutResponse checkoutOrder = orderService.addOrder(userId, paymentMethod);
             cartService.emptyCart(userId);
             return ResponseEntity.status(201).body(GenericResponse.builder()
                     .message(ResponseMessage.CREATED)
-                    .responseData(checkoutResponse)
+                    .responseData(checkoutOrder)
                     .build());
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(GenericResponse.builder()
@@ -126,13 +152,15 @@ public class UserController {
         }
     }
 
-    @PatchMapping("/{userId}/password")
-    public ResponseEntity<GenericResponse> addToUserCart(@PathVariable Long userId, @RequestBody UpdatePasswordRequest request){
+    @PatchMapping("/password")
+    public ResponseEntity<GenericResponse> addToUserCart(@RequestBody UpdatePasswordRequest request, Authentication authentication){
+        String userName = authentication.getName();
+        log.info("Updating password for, {}", userName);
         try {
             String encodedPassword = passwordEncoder.encode(request.getNewPassword());
             return ResponseEntity.accepted().body(GenericResponse.builder()
                     .message(ResponseMessage.ACCEPTED)
-                    .responseData(userService.updateUserPassword(userId, encodedPassword))
+                    .responseData(userService.updateUserPassword(userName, encodedPassword))
                     .build());
         }catch (NoSuchElementException e){
             return ResponseEntity.status(404).body(GenericResponse.builder()
@@ -147,13 +175,15 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<GenericResponse> getUser(@PathVariable Long userId){
+    @GetMapping("/")
+    public ResponseEntity<GenericResponse> getUser(Authentication authentication){
+        String userName = authentication.getName();
+        log.info("Fetching user: {}", userName);
         try {
             return ResponseEntity.ok(
                     GenericResponse.builder()
                             .message(ResponseMessage.SUCCESS)
-                            .responseData(userService.loadUserById(userId))
+                            .responseData(userService.loadUserByUsername(userName))
                             .build());
         }catch (UsernameNotFoundException e){
             return ResponseEntity.status(404).body(
