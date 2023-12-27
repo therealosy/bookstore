@@ -1,6 +1,5 @@
 package com.bookstore.controller;
 
-import com.bookstore.model.entity.Order;
 import com.bookstore.model.entity.Payment;
 import com.bookstore.model.enums.PaymentMethod;
 import com.bookstore.model.enums.ResponseMessage;

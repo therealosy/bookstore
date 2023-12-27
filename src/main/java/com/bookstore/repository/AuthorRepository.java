@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
-import java.util.Optional;
 
 public interface AuthorRepository extends JpaRepository<Author, Long> {
     @Query("SELECT u FROM Author u WHERE firstName LIKE %:name% OR lastName LIKE %:name% OR penName LIKE %:name%")
