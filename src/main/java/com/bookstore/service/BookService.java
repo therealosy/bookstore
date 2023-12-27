@@ -32,7 +32,7 @@ public class BookService {
 
         Book book = bookRepository.findById(id).orElseThrow();
 
-        log.info("Found book: {}", book);
+        log.info("Found book: {}", book.getTitle());
 
         return book;
     }
@@ -50,7 +50,7 @@ public class BookService {
 
     public UpdateResponse setAuthors(Long id, @NotNull SetBookAuthorsRequest request){
 
-        Set<Author> authors = new HashSet<>(authorService.loadAuthorsByIds(request.getAuthorIds()));
+        List<Author> authors = new ArrayList<>(authorService.loadAuthorsByIds(request.getAuthorIds()));
         if (authors.isEmpty()){
             throw new NoSuchElementException("No Authors found");
         }
@@ -60,7 +60,7 @@ public class BookService {
         Book book = bookRepository.findById(id).orElseThrow();
         book.setAuthors(authors);
 
-        log.info("Added authors to book. Book is now: {}", book);
+        log.info("Added authors to book. Authors are now is now: {}", book.getAuthors());
 
         bookRepository.save(book);
 
@@ -69,7 +69,7 @@ public class BookService {
 
     public UpdateResponse setGenres(Long id, @NotNull SetBookGenresRequest request){
 
-        Set<Genre> genres = new HashSet<>(genreService.loadGenreByIds(request.getGenreIds()));
+        List<Genre> genres = new ArrayList<>(genreService.loadGenreByIds(request.getGenreIds()));
         if (genres.isEmpty()){
             throw new NoSuchElementException("No Genre found");
         }
@@ -96,7 +96,7 @@ public class BookService {
 
     public Collection<Book> loadAllBooksByAuthor(String authorName){
         log.info("Searching for authors with title: {}", authorName);
-        Collection<Author> authors = authorService.loadAuthorsByFirstNameOrLastName(authorName);
+        Collection<Author> authors = authorService.loadAuthorByName(authorName);
 
         log.info("Got authors {}", authors);
 
