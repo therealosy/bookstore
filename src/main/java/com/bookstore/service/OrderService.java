@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Slf4j
@@ -67,5 +68,9 @@ public class OrderService {
         log.info("Found Order {}", order);
 
         return  order;
+    }
+
+    public void validateOrder(String orderReference) throws NoSuchElementException{
+        loadOrderByReference(orderReference);
     }
 }
