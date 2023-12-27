@@ -6,6 +6,9 @@ import com.bookstore.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -15,13 +18,19 @@ public class CartService {
     private final BookService bookService;
 
     public Cart loadCartByUserId(Long cartUserId){
-        return cartRepository.findById(cartUserId).orElseThrow();
+        Cart cart = cartRepository.findById(cartUserId).orElse(null);
+        if (cart == null)
+            cart = createCart(cartUserId);
+        return  cart;
     }
 
     public Cart addBookToCart(Long cartUserId, Long bookId){
-        Cart currentCart = cartRepository.findById(cartUserId).orElseThrow();
+        Cart currentCart = cartRepository.findById(cartUserId).orElse(null);
+        if (currentCart == null)
+            currentCart = createCart(cartUserId);
+
         Book book = bookService.loadBookById(bookId);
-        Set<Book> books = currentCart.getBooks();
+        List<Book> books = new ArrayList<>(currentCart.getBooks());
         books.add(book);
         currentCart.setBooks(books);
 
@@ -40,7 +49,7 @@ public class CartService {
     public Cart removeBookFromCart(Long cartUserId, Long bookId){
         Cart currentCart = cartRepository.findById(cartUserId).orElseThrow();
         Book book = bookService.loadBookById(bookId);
-        Set<Book> books = currentCart.getBooks();
+        List<Book> books = new ArrayList<>(currentCart.getBooks());
         books.remove(book);
         currentCart.setBooks(books);
 
