@@ -1,5 +1,6 @@
 package com.bookstore.service;
 
+import com.bookstore.model.entity.Order;
 import com.bookstore.model.entity.User;
 import com.bookstore.model.enums.Role;
 import com.bookstore.model.request.RegisterRequest;
@@ -9,15 +10,19 @@ import com.bookstore.model.request.UpdateUserRequest;
 import com.bookstore.model.response.UpdateResponse;
 import com.bookstore.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.Collection;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
@@ -69,8 +74,8 @@ public class UserService implements UserDetailsService {
         return UpdateResponse.builder().message("Successfully Updated User details").build();
     }
 
-    public UpdateResponse updateUserPassword(Long id, String newPassword) throws UsernameNotFoundException{
-        Optional<User> oldUser = userRepository.findById(id);
+    public UpdateResponse updateUserPassword(String userName, String newPassword) throws UsernameNotFoundException{
+        Optional<User> oldUser = userRepository.findByEmail(userName);
         if(oldUser.isEmpty())
             throw new UsernameNotFoundException("User not found");
 
@@ -80,6 +85,21 @@ public class UserService implements UserDetailsService {
         userRepository.save(updatedUser);
 
         return UpdateResponse.builder().message("Successfully Updated Password").build();
+    }
+
+    public Long getUserIdFromAuthentication(Authentication authentication){
+        Object principal = authentication.getPrincipal();
+        log.info("Getting Id from principal: {}", principal);
+        if (principal instanceof User) {
+            return ((User)principal).getUserId();
+        }else {
+            return loadUserByUsername(authentication.getName()).getUserId();
+        }
+    }
+
+    public Collection<Order> loadUserOrders(Long id){
+        User user = loadUserById(id);
+        return user.getOrders();
     }
 
     public void enableUser(Long id) throws Exception{
