@@ -20,7 +20,7 @@ import java.util.Set;
 public class Author {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long authorId;
 
     @Column(nullable = false)
@@ -30,13 +30,20 @@ public class Author {
     private String lastName;
 
     @Column
-    private String middleName;
-
+    private String penName;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "authors", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    private Set<Book> books;
+    @ManyToMany(mappedBy = "authors", fetch = FetchType.EAGER)
+    private List<Book> books;
 
+    @Override
+    public String toString(){
+        return "Author{"
+                +"firstName='" + this.firstName +"', "
+                +"lastName='" + this.lastName +"', "
+                +"penName='" +this.penName
+                +"' }";
+    }
 }
 
 

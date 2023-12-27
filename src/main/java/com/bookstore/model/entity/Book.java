@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -20,7 +21,7 @@ import java.util.Set;
 public class Book {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bookId;
 
     @Column(nullable = false)
@@ -30,20 +31,20 @@ public class Book {
     @ISBNConstraint
     private String isbn;
 
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name="bookAuthors",
             joinColumns = @JoinColumn(name = "bookId"),
             inverseJoinColumns = @JoinColumn(name = "authorId")
     )
-    private Set<Author> authors;
+    private List<Author> authors;
 
 
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name="bookGenres",
             joinColumns = @JoinColumn(name = "bookId"),
             inverseJoinColumns = @JoinColumn(name = "genreId")
     )
-    private Set<Genre> genres;
+    private List<Genre> genres;
 
     @Column(nullable = false)
     private Long price;
@@ -52,10 +53,22 @@ public class Book {
     private Integer yearPublished;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "books")
+    @ManyToMany(mappedBy = "books", fetch = FetchType.LAZY)
     private Set<Cart> carts;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "books")
+    @ManyToMany(mappedBy = "books", fetch = FetchType.LAZY)
     private Set<Order> orders;
+
+    @Override
+    public String toString(){
+        return "Book{"
+                +"title='" + this.title + "', "
+                +"isbn='" + this.isbn + "', "
+                +"yearPublished=" +this.yearPublished + ", "
+                +"price=" + this.price + ", "
+                +"genres=" + this.genres + ", "
+                +"authors=" + this.authors
+                +"' }";
+    }
 }

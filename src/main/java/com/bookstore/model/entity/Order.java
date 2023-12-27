@@ -2,15 +2,18 @@ package com.bookstore.model.entity;
 
 import com.bookstore.model.enums.PaymentMethod;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
+import org.hibernate.annotations.CreationTimestamp;
+
 
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
+
 
 @Data
 @Builder
@@ -20,9 +23,10 @@ import java.util.Set;
 @Table(name = "orders")
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderId;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "userId")
     private User user;
@@ -35,7 +39,7 @@ public class Order {
             joinColumns = @JoinColumn(name = "orderId"),
             inverseJoinColumns = @JoinColumn(name = "bookId")
     )
-    private Set<Book> books;
+    private List<Book> books;
 
     @Column(nullable = false)
     private Long total;
@@ -47,8 +51,19 @@ public class Order {
     private String orderReference;
 
 
-    @CreatedDate
+    @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Date dateCheckedOut;
+
+    @Override
+    public String toString(){
+        return "Order{"
+                +"orderReference='" + this.orderReference + "', "
+                +"total=" + this.total + ", "
+                +"hasPaid=" +this.hasPaid + ", "
+                +"dateCheckedOut=" + this.dateCheckedOut + ", "
+                +"books=" + this.books
+                +" }";
+    }
 }

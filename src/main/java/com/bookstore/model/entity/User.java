@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,7 +17,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @Builder
@@ -28,7 +27,7 @@ import java.util.Set;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
     @Column(nullable = false, unique = true)
@@ -53,11 +52,12 @@ public class User implements UserDetails {
 
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    @CreatedDate
+    @CreationTimestamp
     private Date dateCreated;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
-    private Set<Order> orders;
+    private List<Order> orders;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -87,5 +87,18 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return isUserEnabled;
+    }
+
+    @Override
+    public String toString(){
+        return "User{"
+                +"id='" + this.userId + "', "
+                +"firstName='" + this.firstName + "', "
+                +"lastName='" + this.lastName + "', "
+                +"email='" + this.email + "', "
+                +"role=" +this.role + ", "
+                +"isUserEnabled=" +this.isUserEnabled + ", "
+                +"dateCreated=" + this.dateCreated
+                +" }";
     }
 }

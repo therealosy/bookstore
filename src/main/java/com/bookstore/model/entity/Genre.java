@@ -19,16 +19,21 @@ import java.util.Set;
 @Table(name = "genres")
 public class Genre {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long genreId;
 
     @Column(nullable = false)
     private String genreTitle;
 
-
-
     @JsonIgnore
-    @ManyToMany(mappedBy = "genres", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    private Set<Book> books;
+    @ManyToMany(mappedBy = "genres", fetch = FetchType.EAGER)
+    private List<Book> books;
+
+    @Override
+    public String toString(){
+        return "Genre{"
+                +"title='" + this.genreTitle
+                +"' }";
+    }
 
 }
