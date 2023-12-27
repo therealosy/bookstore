@@ -1,14 +1,15 @@
 package com.bookstore.service;
 
 import com.bookstore.model.entity.Author;
-import com.bookstore.model.entity.Book;
 import com.bookstore.repository.AuthorRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthorService{
@@ -23,7 +24,12 @@ public class AuthorService{
 
 
     public Author loadAuthorById(Long id) {
-        return authorRepository.findById(id).orElseThrow();
+        log.info("Getting author with ID: {}", id);
+        Author author = authorRepository.findById(id).orElseThrow();
+
+        log.info("Got Author: {}", author);
+
+        return author;
     }
 
 
@@ -31,19 +37,23 @@ public class AuthorService{
         Author updatedAuthor = authorRepository.findById(id).orElseThrow();
 
         updatedAuthor.setFirstName(author.getFirstName());
-        updatedAuthor.setMiddleName(author.getMiddleName());
         updatedAuthor.setLastName(author.getLastName());
+        updatedAuthor.setPenName(author.getPenName());
 
         return authorRepository.save(updatedAuthor);
     }
 
 
     public Author addAuthor(Author author) {
+        if (author.getPenName() == null || author.getPenName().isBlank())
+            author.setPenName(String.join(" ", author.getFirstName(), author.getLastName()));
+        log.info("Saving author to DB: {}", author);
+
         return authorRepository.save(author);
     }
 
-    public Collection<Author> loadAuthorsByFirstNameOrLastName(String firstNameOrLastName) {
-        return authorRepository.findAllByFirstNameOrLastName(firstNameOrLastName, firstNameOrLastName);
+    public Collection<Author> loadAuthorByName(String name) {
+        return authorRepository.searchAuthorByName(name);
     }
 
     public Collection<Author> loadAuthorsByIds(Collection<Long> authorIds){
