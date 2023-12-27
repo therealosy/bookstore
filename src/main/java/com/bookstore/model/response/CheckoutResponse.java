@@ -15,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class CheckoutResponse {
     private PaymentMethod paymentMethod;
-    private Set<String> requiredParameters;
+    private Set<String> paymentObject;
     private String orderReference;
     private PaymentStatus paymentStatus;
     private Long totalAmount;

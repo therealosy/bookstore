@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,7 +21,7 @@ import java.util.stream.Stream;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
-    public Set<String> loadRequiredParams(@NotNull PaymentMethod paymentMethod) throws InvalidPaymentMethodException{
+    public Set<String> loadPaymentObject(@NotNull PaymentMethod paymentMethod) throws InvalidPaymentMethodException{
         Set<String> requiredParams = null;
 
         switch (paymentMethod){
@@ -49,6 +48,7 @@ public class PaymentService {
     public PaymentResponse addPayment(PaymentMethod paymentMethod,PaymentRequest request) {
         String paymentReference = UUID.randomUUID().toString();
         String orderReference = request.getPaymentObject().get("orderReference");
+
 
         Payment payment = paymentRepository.save(Payment.builder()
                 .paymentReference(paymentReference)
