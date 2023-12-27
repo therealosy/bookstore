@@ -4,7 +4,6 @@ import com.bookstore.model.entity.Order;
 import com.bookstore.model.entity.User;
 import com.bookstore.model.enums.Role;
 import com.bookstore.model.request.RegisterRequest;
-import com.bookstore.model.request.UpdatePasswordRequest;
 import com.bookstore.model.request.UpdateRoleRequest;
 import com.bookstore.model.request.UpdateUserRequest;
 import com.bookstore.model.response.UpdateResponse;
@@ -15,10 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
 import java.util.Collection;
 import java.util.Optional;
 
